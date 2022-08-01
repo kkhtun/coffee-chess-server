@@ -6,18 +6,21 @@ module.exports = ({ GamesController }) => ({
     getOneGame: GamesController.getOneGame,
     joinGame: async ({ gameId, player }) => {
         const game = await GamesController.getOneGame({ gameId });
-        if (
-            game.player_one === player._id.toString() ||
-            game.player_two === player._id.toString()
-        ) {
-            return game;
+        const { player_one, player_two } = game;
+        if (player_one._id.toString() === player._id.toString()) {
+            return { ...game, color: "w" };
         }
-        if (!game.player_two) {
-            return await GamesController.updateGame({
+        if (player_two && player_two._id.toString() === player._id.toString()) {
+            return { ...game, color: "b" };
+        }
+        if (!player_two) {
+            const updatedGameWithP2 = await GamesController.updateGame({
                 _id: gameId,
                 player_two: player._id,
             });
+            return { ...updatedGameWithP2, color: "b" };
         }
+        return game;
     },
     // movePiece: ({ move, fen }) => {
     //     // validate using ChessJS
