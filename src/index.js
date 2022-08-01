@@ -4,12 +4,12 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 // Initialize Socket IO
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: { origin: "*" },
-});
+// const { createServer } = require("http");
+// const io = require("socket.io");
+// const httpServer = createServer(app);
+// const io = new Server(httpServer, {
+//     cors: { origin: "*" },
+// });
 
 // Initialize Loaders for DB, Dependency Injections etc.
 const loaders = require("./loaders/index");
@@ -35,13 +35,13 @@ app.get("/", (req, res) => {
 // Main Application Routes
 app.use("/api/v1", extractAuthInfo, routes);
 
-// Main Socket Handler
-io.use(isSocketAuthenticated).on("connection", (socket) =>
-    handleSockets({ io, socket })
-);
-httpServer.listen(process.env.SOCKET_PORT, () =>
-    console.log("SocketIO listening at", process.env.SOCKET_PORT)
-);
+// // Main Socket Handler
+// io.use(isSocketAuthenticated).on("connection", (socket) =>
+//     handleSockets({ io, socket })
+// );
+// httpServer.listen(process.env.SOCKET_PORT, () =>
+//     console.log("SocketIO listening at", process.env.SOCKET_PORT)
+// );
 
 app.get("/auth", extractAuthInfo, isAuthenticated, (req, res) => {
     return res.status(200).send({
@@ -64,9 +64,18 @@ app.use((req, res, next) =>
     const port = process.env.PORT || 3000;
     if (process.env.ENV !== "testing") {
         await dbConnection;
-        app.listen(port, () => {
+        const serverHandler = app.listen(port, () => {
             console.log("Server listening at port :", port);
         });
+
+        const io = require("socket.io")(serverHandler, {
+            cors: {
+                origin: "*",
+            },
+        });
+        io.use(isSocketAuthenticated).on("connection", (socket) =>
+            handleSockets({ io, socket })
+        );
     }
 })();
 
