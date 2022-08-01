@@ -39,7 +39,9 @@ app.use("/api/v1", extractAuthInfo, routes);
 io.use(isSocketAuthenticated).on("connection", (socket) =>
     handleSockets({ io, socket })
 );
-httpServer.listen(8081, () => console.log("SocketIO listening at 8081"));
+httpServer.listen(process.env.SOCKET_PORT, () =>
+    console.log("SocketIO listening at", process.env.SOCKET_PORT)
+);
 
 app.get("/auth", extractAuthInfo, isAuthenticated, (req, res) => {
     return res.status(200).send({
