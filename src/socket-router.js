@@ -48,14 +48,7 @@ module.exports =
         socket.on("alert:game", ({ gameId, message }) => {
             socket.to(gameId).emit("alert:game", { message });
         });
-
-        socket.on("leave:game", ({ gameId, name }) => {
-            socket.leaveAll();
-            socket.to(gameId).emit("alert:game", {
-                message: name + " has left the game " + gameId,
-            });
-        });
-
+        // If player leaves a game screen (board), to be safe, I'll just leave him from all the rooms
         socket.on("leave:all", ({ name }) => {
             Array.from(socket.rooms).forEach((gameId) => {
                 socket.to(gameId).emit("alert:game", {

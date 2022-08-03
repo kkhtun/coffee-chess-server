@@ -47,4 +47,20 @@ module.exports = ({ GamesController }) => ({
             return next(e);
         }
     },
+    getRandomGameToJoin: async (req, res, next) => {
+        const { value, error } = Joi.object({
+            playerId: Joi.objectid().required(),
+        }).validate({
+            playerId: req.user ? req.user._id.toString() : undefined,
+        });
+
+        if (error) return next(error);
+
+        try {
+            const ret = await GamesController.getRandomGameToJoin(value);
+            return res.status(200).send(ret);
+        } catch (e) {
+            return next(e);
+        }
+    },
 });

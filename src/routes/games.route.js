@@ -5,8 +5,10 @@ module.exports = ({ GamesHandler }) => {
     const router = Router();
 
     router.post("/", isAuthenticated, GamesHandler.createNewGame);
-    router.get("/:gameId", isAuthenticated, GamesHandler.getOneGame);
     router.get("/", isAuthenticated, GamesHandler.getGames);
+    router.get("/random", isAuthenticated, GamesHandler.getRandomGameToJoin);
+
+    router.get("/:gameId", isAuthenticated, GamesHandler.getOneGame);
 
     return router;
 };

@@ -8,4 +8,5 @@ module.exports = ({ GamesService, UsersService }) => ({
     updateGame: async ({ gameId, ...data }) => {
         return await GamesService.updateGame({ _id: gameId, ...data });
     },
+    getRandomGameToJoin: GamesService.getRandomGameToJoin,
 });

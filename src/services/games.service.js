@@ -34,4 +34,15 @@ module.exports = ({ GamesModel, GAME_ERRORS }) => ({
         if (!game) throw new Error(GAME_ERRORS.NOT_FOUND);
         return game;
     },
+    getRandomGameToJoin: async ({ playerId }) => {
+        // this finds a game with missing player_two
+        const game = await GamesModel.findOne({
+            player_two: { $exists: false },
+            player_one: { $ne: playerId },
+        })
+            .populate("player_one player_two")
+            .lean()
+            .exec();
+        return game;
+    },
 });
