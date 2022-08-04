@@ -36,12 +36,16 @@ module.exports = ({ GamesController }) => ({
         const { value, error } = Joi.object({
             limit: Joi.number().integer().default(10),
             skip: Joi.number().integer().default(0),
-        }).validate(req.query);
+            my_games: Joi.boolean().optional().default(false),
+        }).validate({ ...req.query });
 
         if (error) return next(error);
 
         try {
-            const ret = await GamesController.getGames(value);
+            const ret = await GamesController.getGames({
+                ...value,
+                playerId: value.my_games && req.user ? req.user._id : undefined,
+            });
             return res.status(200).send(ret);
         } catch (e) {
             return next(e);

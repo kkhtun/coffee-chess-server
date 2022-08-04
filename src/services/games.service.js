@@ -14,14 +14,20 @@ module.exports = ({ GamesModel, GAME_ERRORS }) => ({
         if (!game) throw new Error(GAME_ERRORS.NOT_FOUND);
         return game;
     },
-    getGames: async ({ limit, skip, ...filter }) => {
-        const data = await GamesModel.find(filter)
+    getGames: async ({ limit, skip, playerId }) => {
+        let query = {};
+        if (playerId) {
+            query = {
+                $or: [{ player_one: playerId }, { player_two: playerId }],
+            };
+        }
+        const data = await GamesModel.find(query)
             .skip(skip)
             .limit(limit)
             .populate("player_one player_two")
             .lean()
             .exec();
-        const count = await GamesModel.countDocuments(filter);
+        const count = await GamesModel.countDocuments(query);
         return { data, count };
     },
     updateGame: async ({ _id, ...update }) => {
