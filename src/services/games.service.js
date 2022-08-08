@@ -3,6 +3,7 @@ module.exports = ({ GamesModel, GAME_ERRORS }) => ({
         const game = new GamesModel({
             fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", // initial board position FEN
             player_one: playerId,
+            pgn: "",
         });
         return await game.save();
     },

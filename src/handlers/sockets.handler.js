@@ -8,17 +8,14 @@ module.exports = ({ GamesController }) => ({
         const game = await GamesController.getOneGame({ gameId });
         const { player_one, player_two } = game;
         if (player_one._id.toString() === player._id.toString()) {
-            return { ...game, color: "w" };
-        }
-        if (player_two && player_two._id.toString() === player._id.toString()) {
-            return { ...game, color: "b" };
+            return game;
         }
         if (!player_two) {
             const updatedGameWithP2 = await GamesController.updateGame({
                 _id: gameId,
                 player_two: player._id,
             });
-            return { ...updatedGameWithP2, color: "b" };
+            return updatedGameWithP2;
         }
         return game;
     },

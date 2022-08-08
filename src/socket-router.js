@@ -1,6 +1,6 @@
 module.exports =
     (SocketHandler) =>
-    ({ io, socket }) => {
+    ({ socket }) => {
         socket.emit("connection", "Hello, Socket");
 
         socket.on("join:game", async ({ gameId }) => {
@@ -12,34 +12,42 @@ module.exports =
 
             socket.leaveAll();
             socket.join(gameId);
-            socket.emit("joined:game", game);
+            socket.to(gameId).emit("joined:game", game);
             socket.to(gameId).emit("alert:game", {
-                message: `${player.name} has joined the game`,
+                message: `${player.name} joined the game`,
             });
         });
 
         socket.on(
             "move:piece",
-            async ({ gameId, move, fen, gameOver = false }) => {
-                const player = socket.data.user;
-                // currently no server side validation yet
+            async ({
+                gameId,
+                move,
+                fen,
+                pgn,
+                containsGameOverMessage = false,
+            }) => {
+                // currently no server side validation yet, should validate the move here
                 const valid = true;
                 if (valid === true) {
                     const game = await SocketHandler.updateGame({
                         _id: gameId,
                         fen,
+                        pgn,
                     });
-                    socket
-                        .to(gameId)
-                        .emit("moved:piece", { move, fen: game.fen });
+                    socket.to(gameId).emit("moved:piece", {
+                        move,
+                        fen: game.fen,
+                        pgn: game.pgn,
+                    });
 
-                    if (gameOver) {
+                    if (containsGameOverMessage) {
                         socket.to(gameId).emit("alert:game", {
-                            message: `Checkmate! ${player.name} has won the game`,
+                            message: containsGameOverMessage,
                         });
                     }
                 } else {
-                    socket.to(gameId).emit("moved:invalid", { move, fen });
+                    socket.to(gameId).emit("moved:invalid", { move, fen, pgn });
                 }
             }
         );
@@ -52,7 +60,7 @@ module.exports =
         socket.on("leave:all", ({ name }) => {
             Array.from(socket.rooms).forEach((gameId) => {
                 socket.to(gameId).emit("alert:game", {
-                    message: name + " has left the game",
+                    message: name + " left the game",
                 });
             });
             socket.leaveAll();

@@ -6,6 +6,12 @@ const GamesSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        pgn: {
+            type: String,
+            // required: true,
+            // Ref: https://github.com/Automattic/mongoose/issues/7150
+            default: "",
+        },
         player_one: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Users",
