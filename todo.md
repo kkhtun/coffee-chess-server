@@ -1,1 +1,3 @@
 -   Need to investigate inability to broadcast in room
+-   Chess AI
+-   Server Side ChessJS Validation
